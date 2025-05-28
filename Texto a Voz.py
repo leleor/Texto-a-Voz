@@ -4,7 +4,8 @@
 import subprocess
 import sys
 
-librerias_necesarias = ['requests', 'gTTS', 'PyPDF2']
+librerias_necesarias = ['requests', 'gtts', 'PyPDF2']
+
 for libreria in librerias_necesarias:
     try:
         __import__(libreria)
