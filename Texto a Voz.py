@@ -1,56 +1,65 @@
-# Este programa se puede actualizar solo.
-# Comprobará si hay una versión más reciente subida a internet.
-# Si la hay, se actualizará automáticamente y te pedirá que lo abras de nuevo.
+# ===============================
+# 1. INSTALAR LIBRERÍAS SI FALTAN
+# ===============================
+import subprocess
+import sys
 
+librerias_necesarias = ['requests', 'gTTS', 'PyPDF2']
+for libreria in librerias_necesarias:
+    try:
+        __import__(libreria)
+    except ImportError:
+        print(f"📦 Instalando librería que falta: {libreria}...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", libreria])
+
+# ===============================
+# 2. ACTUALIZACIÓN AUTOMÁTICA
+# ===============================
 import os
 import requests
 import hashlib
 
-# Dirección de internet donde está guardada la última versión del archivo
-# 💡 CAMBIA esta dirección por la tuya real
+# Dirección del archivo en GitHub (versión actualizada del programa)
 URL_DEL_ARCHIVO = 'https://raw.githubusercontent.com/leleor/Texto-a-Voz/refs/heads/main/Texto%20a%20Voz.py'
-
-# Esta parte localiza el archivo que estás usando ahora mismo
 archivo_local = os.path.abspath(__file__)
 
-# Esta función crea un "resumen" del texto para compararlo fácilmente
 def calcular_resumen(texto):
     return hashlib.sha256(texto.encode('utf-8')).hexdigest()
 
-# Esta parte comprueba si hay una versión nueva del archivo en internet
 def comprobar_y_actualizar():
     try:
         respuesta = requests.get(URL_DEL_ARCHIVO)
         if respuesta.status_code == 200:
-            version_en_internet = respuesta.text
-
+            version_online = respuesta.text
             with open(archivo_local, 'r', encoding='utf-8') as f:
-                version_en_tu_ordenador = f.read()
+                version_local = f.read()
 
-            # Comparamos las dos versiones
-            if calcular_resumen(version_en_internet) != calcular_resumen(version_en_tu_ordenador):
+            if calcular_resumen(version_online) != calcular_resumen(version_local):
                 print("🔄 Se ha encontrado una versión nueva. Actualizando...")
                 with open(archivo_local, 'w', encoding='utf-8') as f:
-                    f.write(version_en_internet)
+                    f.write(version_online)
                 print("✅ El programa se ha actualizado. Ábrelo de nuevo.")
+                input("Pulsa Enter para salir...")
                 exit()
             else:
                 print("✔️ El programa ya está actualizado.")
         else:
-            print("⚠️ No se pudo comprobar si hay actualizaciones. (Código:", respuesta.status_code, ")")
+            print(f"⚠️ No se pudo comprobar si hay actualizaciones. (Código: {respuesta.status_code})")
     except Exception as e:
-        print("❌ Ha ocurrido un error al buscar actualizaciones:", e)
+        print(f"❌ Error al buscar actualizaciones: {e}")
 
-# Primero comprobamos si hay una versión nueva
 comprobar_y_actualizar()
 
+# ===============================
+# 3. PROGRAMA PRINCIPAL
+# ===============================
 from gtts import gTTS
 import PyPDF2
 
-# Esta parte hace que el programa trabaje en la misma carpeta donde está guardado
+# Asegura que se trabaje en la carpeta donde está guardado el programa
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-# Pedimos al usuario que escriba el nombre del archivo a leer
+# Pedimos el nombre del archivo que el usuario quiere convertir a voz
 nombre_archivo = input("Introduce el nombre del archivo (por ejemplo, archivo.pdf): ").strip()
 
 # Detectamos la extensión (tipo) del archivo
@@ -67,13 +76,15 @@ try:
         with open(nombre_archivo, 'rb') as f:
             lector = PyPDF2.PdfReader(f)
             for pagina in lector.pages:
-                texto += pagina.extract_text()
+                texto_extraido = pagina.extract_text()
+                if texto_extraido:
+                    texto += texto_extraido
     else:
         print("❌ Tipo de archivo no válido. Usa un archivo .txt o .pdf.")
         input("Pulsa Enter para salir...")
         exit()
 
-    # Convertimos el texto a voz (audio)
+    # Convertimos el texto a voz
     tts = gTTS(text=texto, lang='es')
     tts.save("audio.mp3")
     print("✅ Se ha creado el archivo de audio 'audio.mp3'.")
