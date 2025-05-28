@@ -43,7 +43,7 @@ def comprobar_y_actualizar():
                 input("Pulsa Enter para salir...")
                 exit()
             else:
-                print("✔️ El programa ya está actualizado.")
+                print("El programa ya está actualizado.")
         else:
             print(f"⚠️ No se pudo comprobar si hay actualizaciones. (Código: {respuesta.status_code})")
     except Exception as e:
