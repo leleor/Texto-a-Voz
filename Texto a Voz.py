@@ -8,7 +8,7 @@ import hashlib
 
 # Dirección de internet donde está guardada la última versión del archivo
 # 💡 CAMBIA esta dirección por la tuya real
-URL_DEL_ARCHIVO = 'https://raw.githubusercontent.com/USUARIO/REPO/main/lector.py'
+URL_DEL_ARCHIVO = 'https://raw.githubusercontent.com/leleor/Texto-a-Voz/refs/heads/main/Texto%20a%20Voz.py'
 
 # Esta parte localiza el archivo que estás usando ahora mismo
 archivo_local = os.path.abspath(__file__)
